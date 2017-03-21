@@ -49,12 +49,6 @@ public class Startup extends BroadcastReceiver {
         final String action = intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)
                 || Intent.ACTION_PRE_BOOT_COMPLETED.equals(action)) {
-            // Disable button settings if needed
-            if (!hasButtonProcs()) {
-                disableComponent(context, ButtonSettingsActivity.class.getName());
-            } else {
-                enableComponent(context, ButtonSettingsActivity.class.getName());
-
                 // Restore nodes to saved preference values
                 for (String pref : Constants.sButtonPrefKeys) {
                     String node, value;
@@ -90,7 +84,6 @@ public class Startup extends BroadcastReceiver {
     static boolean hasButtonProcs() {
         return (fileExists(Constants.NOTIF_SLIDER_TOP_NODE) &&
                 fileExists(Constants.NOTIF_SLIDER_MIDDLE_NODE) &&
-                fileExists(Constants.NOTIF_SLIDER_BOTTOM_NODE)) ||
                 fileExists(Constants.BUTTON_SWAP_NODE);
     }
 

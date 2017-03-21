@@ -68,16 +68,6 @@
                 android:value="@string/summary_empty" />
         </activity>
 
-        <!-- Additional button settings (Button settings) -->
-        <activity
-            android:name=".ButtonSettingsActivity"
-            android:label="@string/button_panel_title">
-            <intent-filter>
-                <action android:name="org.dirtyunicorns.settings.device.ADDITIONAL_BUTTONS_SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <receiver android:name=".Startup" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
