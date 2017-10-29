@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.lineageos.settings.device.utils;
+package org.dirtyunicorns.settings.device.utils;
 
 import java.util.HashMap;
 import java.util.Map;

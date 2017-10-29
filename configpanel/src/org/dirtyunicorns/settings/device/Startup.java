@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.lineageos.settings.device;
+package org.dirtyunicorns.settings.device;
 
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;

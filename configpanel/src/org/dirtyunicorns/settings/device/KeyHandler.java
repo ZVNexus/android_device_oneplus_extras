@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.lineageos.settings.device;
+package org.dirtyunicorns.settings.device;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -115,7 +115,7 @@ public class KeyHandler implements DeviceKeyHandler {
                 mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
 
                 Intent intent = new Intent(
-                        lineageos.content.Intent.ACTION_SCREEN_CAMERA_GESTURE);
+                        dirtyunicorns.content.Intent.ACTION_SCREEN_CAMERA_GESTURE);
                 mContext.sendBroadcast(intent, Manifest.permission.STATUS_BAR_SERVICE);
                 doHapticFeedback();
             }
