@@ -24,7 +24,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.INJECT_EVENTS"/>
-    <uses-permission android:name="lineageos.permission.HARDWARE_ABSTRACTION_ACCESS" />
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
@@ -81,8 +80,9 @@
 
         <receiver android:name=".Startup" >
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.PRE_BOOT_COMPLETED" />
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
-                <action android:name="lineageos.intent.action.INITIALIZE_LINEAGE_HARDWARE" />
             </intent-filter>
         </receiver>
 

@@ -34,8 +34,11 @@ import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.lineageos.internal.util.FileUtils;
-import org.lineageos.settings.device.utils.Constants;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Startup extends BroadcastReceiver {
 
@@ -44,7 +47,8 @@ public class Startup extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
-        if (lineageos.content.Intent.ACTION_INITIALIZE_LINEAGE_HARDWARE.equals(action)) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(action)
+                || Intent.ACTION_PRE_BOOT_COMPLETED.equals(action)) {
             // Disable button settings if needed
             if (!hasButtonProcs()) {
                 disableComponent(context, ButtonSettingsActivity.class.getName());
@@ -62,7 +66,7 @@ public class Startup extends BroadcastReceiver {
                         value = Constants.isPreferenceEnabled(context, pref) ?
                                 "1" : "0";
                     }
-                    if (!FileUtils.writeLine(node, value)) {
+                    if (!writeLine(node, value)) {
                         Log.w(TAG, "Write to node " + node +
                             " failed while restoring saved preference values");
                     }
@@ -84,10 +88,10 @@ public class Startup extends BroadcastReceiver {
     }
 
     static boolean hasButtonProcs() {
-        return (FileUtils.fileExists(Constants.NOTIF_SLIDER_TOP_NODE) &&
-                FileUtils.fileExists(Constants.NOTIF_SLIDER_MIDDLE_NODE) &&
-                FileUtils.fileExists(Constants.NOTIF_SLIDER_BOTTOM_NODE)) ||
-                FileUtils.fileExists(Constants.BUTTON_SWAP_NODE);
+        return (fileExists(Constants.NOTIF_SLIDER_TOP_NODE) &&
+                fileExists(Constants.NOTIF_SLIDER_MIDDLE_NODE) &&
+                fileExists(Constants.NOTIF_SLIDER_BOTTOM_NODE)) ||
+                fileExists(Constants.BUTTON_SWAP_NODE);
     }
 
     static boolean hasOClick() {
@@ -128,5 +132,43 @@ public class Startup extends BroadcastReceiver {
         } else {
             context.stopService(serviceIntent);
         }
+    }
+
+    /**
+    * Checks whether the given file is writable
+    *
+    * @return true if writable, false if not
+    */
+    public static boolean isFileWritable(String fileName) {
+        final File file = new File(fileName);
+        return file.exists() && file.canWrite();
+    }
+
+    /**
+     * Writes the given value into the given file
+     *
+     * @return true on success, false on failure
+     */
+     public static boolean writeLine(String fileName, String value) {
+        BufferedWriter writer = null;
+         try {
+            writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(value);
+        } catch (FileNotFoundException e) {
+            Log.w(TAG, "No such file " + fileName + " for writing", e);
+            return false;
+        } catch (IOException e) {
+            Log.e(TAG, "Could not write to file " + fileName, e);
+            return false;
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                // Ignored, not much we can do anyway
+            }
+        }
+         return true;
     }
 }

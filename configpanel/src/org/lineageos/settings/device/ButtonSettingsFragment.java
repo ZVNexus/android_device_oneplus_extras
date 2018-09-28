@@ -27,8 +27,11 @@ import android.support.v7.preference.PreferenceGroup;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import org.lineageos.internal.util.FileUtils;
-import org.lineageos.settings.device.utils.Constants;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class ButtonSettingsFragment extends PreferenceFragment
         implements OnPreferenceChangeListener {
@@ -42,14 +45,14 @@ public class ButtonSettingsFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String node = Constants.sBooleanNodePreferenceMap.get(preference.getKey());
-        if (!TextUtils.isEmpty(node) && FileUtils.isFileWritable(node)) {
+        if (!TextUtils.isEmpty(node) && isFileWritable(node)) {
             Boolean value = (Boolean) newValue;
-            FileUtils.writeLine(node, value ? "1" : "0");
+            writeLine(node, value ? "1" : "0");
             return true;
         }
         node = Constants.sStringNodePreferenceMap.get(preference.getKey());
-        if (!TextUtils.isEmpty(node) && FileUtils.isFileWritable(node)) {
-            FileUtils.writeLine(node, (String) newValue);
+        if (!TextUtils.isEmpty(node) && isFileWritable(node)) {
+            writeLine(node, (String) newValue);
             return true;
         }
         return false;
@@ -63,8 +66,8 @@ public class ButtonSettingsFragment extends PreferenceFragment
             SwitchPreference b = (SwitchPreference) findPreference(pref);
             if (b == null) continue;
             String node = Constants.sBooleanNodePreferenceMap.get(pref);
-            if (FileUtils.isFileReadable(node)) {
-                String curNodeValue = FileUtils.readOneLine(node);
+            if (isFileReadable(node)) {
+                String curNodeValue = readOneLine(node);
                 b.setChecked(curNodeValue.equals("1"));
                 b.setOnPreferenceChangeListener(this);
             } else {
@@ -75,8 +78,8 @@ public class ButtonSettingsFragment extends PreferenceFragment
             ListPreference l = (ListPreference) findPreference(pref);
             if (l == null) continue;
             String node = Constants.sStringNodePreferenceMap.get(pref);
-            if (FileUtils.isFileReadable(node)) {
-                l.setValue(FileUtils.readOneLine(node));
+            if (isFileReadable(node)) {
+                l.setValue(readOneLine(node));
                 l.setOnPreferenceChangeListener(this);
             } else {
                 removePref(l);
@@ -104,5 +107,43 @@ public class ButtonSettingsFragment extends PreferenceFragment
         if (parent.getPreferenceCount() == 0) {
             removePref(parent);
         }
+    }
+
+    /**
+    * Checks whether the given file is writable
+    *
+    * @return true if writable, false if not
+    */
+    public static boolean isFileWritable(String fileName) {
+        final File file = new File(fileName);
+        return file.exists() && file.canWrite();
+    }
+
+    /**
+    * Writes the given value into the given file
+    *
+    * @return true on success, false on failure
+    */
+    public static boolean writeLine(String fileName, String value) {
+        BufferedWriter writer = null;
+         try {
+            writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(value);
+        } catch (FileNotFoundException e) {
+            Log.w(TAG, "No such file " + fileName + " for writing", e);
+            return false;
+        } catch (IOException e) {
+            Log.e(TAG, "Could not write to file " + fileName, e);
+            return false;
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                // Ignored, not much we can do anyway
+            }
+        }
+         return true;
     }
 }
